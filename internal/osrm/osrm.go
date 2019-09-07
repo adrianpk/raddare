@@ -2,6 +2,7 @@ package osrm
 
 import (
 	"context"
+	"time"
 
 	"gitlab.com/mikrowezel/config"
 	"gitlab.com/mikrowezel/log"
@@ -45,21 +46,28 @@ func (h *Handler) Init(s svc.Service) chan bool {
 // Routes returns a list of all possible routes from some point
 // to another one ordered by driving time and distante.
 // Sample URL: 'http://router.project-osrm.org/route/v1/driving/13.388860,52.517037;13.397634,52.529407?overview=false'
-//func (h *Handler) Routes(from Point, to ...Point) {
-//var res Response
+func (h *Handler) Routes(points [][2]float64) (*Response, error) {
+	var res Response
+	ctx, _ := context.WithTimeout(context.Background(), h.reqTimeout())
+	req := h.newRoutesRequest(toPointSet(points))
 
-//err := h.query(h.ctx, r.request(), &res)
-//if err != nil {
-//return nil, err
-//}
+	err := h.query(ctx, req, &res)
+	if err != nil {
+		return nil, err
+	}
 
-//return &res, nil
-//}
+	return &res, nil
+}
 
-func (h *Handler) query(ctx context.Context, req *Request, res Response) error {
+func (h *Handler) query(ctx context.Context, req *Request, res *Response) error {
 	err := h.Client.MakeRequest(ctx, req, res)
 	if err != nil {
 		return err
 	}
 	return res.Error()
+}
+
+func (h *Handler) reqTimeout() time.Duration {
+	to := h.Cfg().ValAsInt("osrm.req.timeout.sec", int64(5))
+	return time.Duration(to) * time.Second
 }
