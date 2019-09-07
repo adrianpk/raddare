@@ -30,7 +30,7 @@ func main() {
 	s = newService(ctx, cfg, log, cancel)
 
 	// Add service handlers
-	osrm, err := osrm.NewHandler(ctx, cfg, log)
+	osrm, err := osrm.NewHandler(ctx, cfg, log, "osrm-handler")
 	s.AddHandler(osrm)
 
 	// Set service worker
