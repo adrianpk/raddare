@@ -12,8 +12,8 @@ import (
 
 // Sample URL: http://your-service/routes?src=13.388860,52.517037&dst=13.397634,52.529407&dst=13.428555,52.523219
 
-// startServer starts the server.
-func (m *Manager) startServer() error {
+// initServer starts the server.
+func (m *Manager) initServer() error {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -21,7 +21,7 @@ func (m *Manager) startServer() error {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Regio is running!"))
+		w.Write([]byte("Raddare is running!"))
 	})
 
 	r.Route("/routes", func(r chi.Router) {
