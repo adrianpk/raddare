@@ -1,4 +1,4 @@
-module gitlab.com/raddare
+module github.com/raddare
 
 go 1.12
 

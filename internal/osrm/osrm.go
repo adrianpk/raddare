@@ -1,4 +1,4 @@
-package repo
+package osrm
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	// RepoHandler is a repo handler.
+	// Handler is an OSRM handler.
 	Handler struct {
 		*svc.BaseHandler
 	}

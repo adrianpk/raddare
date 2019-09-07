@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/raddare/internal/osrm"
 	"github.com/raddare/pkg/route"
 	"gitlab.com/mikrowezel/config"
 	"gitlab.com/mikrowezel/log"
@@ -28,8 +29,12 @@ func main() {
 	// Create service
 	s = newService(ctx, cfg, log, cancel)
 
+	// Add service handlers
+	osrm, err := osrm.NewHandler(ctx, cfg, log)
+	s.AddHandler(osrm)
+
 	// Set service worker
-	auth := auth.NewWorker(ctx, cfg, log, "route-worker")
+	auth := route.NewWorker(ctx, cfg, log, "route-worker")
 	s.SetWorker(auth)
 
 	// Initialize handlers and workers
