@@ -87,10 +87,10 @@ func newClient(c httpClient, url string) client {
 }
 
 // newRoutesRequest creates a request.
-func newRoutesRequest(points []Point) Request {
-	return Request{
+func (h Handler) newRoutesRequest(points PointSet) *Request {
+	return &Request{
 		Service: "route",
-		Version: "v1", // TODO: Make this value configurable
+		Version: h.Cfg().ValOrDef("osrm.api.ver", "v1"),
 		Profile: "driving",
 		Points:  points,
 		Options: Options(map[string]string{"overview": "false"}),
@@ -268,6 +268,17 @@ func (r Response) Error() error {
 		return fmt.Errorf("OSRM API error code: %s", r.Code)
 	}
 	return nil
+}
+
+// toPointSet converts a slice of float64 two elements array
+// into a PointSet struct.
+func toPointSet(points [][2]float64) PointSet {
+	var pset PointSet
+	for _, point := range points {
+		p := [2]float64{point[0], point[1]}
+		pset = append(pset, p)
+	}
+	return pset
 }
 
 func encodeSignedNumber(num int, result []byte) []byte {
