@@ -27,3 +27,9 @@ func NewWorker(ctx context.Context, cfg *config.Config, log *logger.Logger, name
 	}
 	return w
 }
+
+// Init service worker.
+func (m *Manager) Init() bool {
+	err := m.initServer()
+	return err != nil
+}
