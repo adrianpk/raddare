@@ -20,7 +20,7 @@ var (
 )
 
 func main() {
-	cfg := config.Load("grn")
+	cfg := config.Load("rdr")
 	log := initLog(cfg)
 
 	ctx, cancel := context.WithCancel(context.Background())
