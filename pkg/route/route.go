@@ -17,7 +17,7 @@ type Manager struct {
 }
 
 const (
-	routesCtxKey contextKey = "routes"
+	waypointsCtxKey contextKey = "waypoints"
 )
 
 // NewWorker creates a new route calculator worker instance.
