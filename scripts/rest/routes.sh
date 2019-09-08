@@ -14,6 +14,9 @@ DST_LNG_1="52.529407"
 # DST 2
 DST_LAT_2="13.428555"
 DST_LNG_2="52.523219"
+# DST 3
+DST_LAT_3="13.388860"
+DST_LNG_3="52.517037"
 
 # Pre
 # Curl and jq installed using nix not found if path not appropriately set
@@ -29,5 +32,5 @@ post () {
 
 
 # Sample GET request: http://your-service/routes?src=13.388860,52.517037&dst=13.397634,52.529407&dst=13.428555,52.523219
-post "http://$HOST:$PORT/$PATH?src=$SRC_LAT,$SRC_LNG&dst=$DST_LAT_1,$DST_LNG_1&dst=$DST_LAT_2,$DST_LNG_2"
+post "http://$HOST:$PORT/$PATH?src=$SRC_LAT,$SRC_LNG&dst=$DST_LAT_1,$DST_LNG_1&dst=$DST_LAT_2,$DST_LNG_2&dst=$DST_LAT_3,$DST_LNG_3"
 
