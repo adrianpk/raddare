@@ -4,23 +4,23 @@
       "legs": [
         {
           "summary": "",
-          "weight": 91093.4,
-          "duration": 88712.4,
+          "weight": 643,
+          "duration": 433,
           "steps": [],
-          "distance": 1997127.7
+          "distance": 1999.6
         },
         {
           "summary": "",
-          "weight": 64801.5,
-          "duration": 64083.6,
+          "weight": 708.5,
+          "duration": 520.4,
           "steps": [],
-          "distance": 1249777.5
+          "distance": 2838.1
         }
       ],
       "weight_name": "routability",
-      "weight": 155894.9,
-      "duration": 152796,
-      "distance": 3246905.2
+      "weight": 1351.5,
+      "duration": 953.4,
+      "distance": 4837.7
     }
   ],
   "waypoints": [
@@ -34,21 +34,21 @@
       ]
     },
     {
-      "hint": "eVZBgn1WQYJeAAAAAAAAAGEPAAAAAAAAAGhbQgAAAAA25g9FAAAAAF4AAAAAAAAAYQ8AAAAAAABXpgAACAVlATglugMCBWUBfx-6Az8A3wqPMaDD",
-      "distance": 163.28444427272424,
-      "name": "Kieriahontie",
+      "hint": "0z4ggJ-rfYkIAAAADQAAAAAAAAAPAQAAW7-PQOKcyEAAAAAApq6DQggAAAANAAAAAAAAAJcAAABXpgAAf27MABiJIQOCbswA_4ghAwAAXwWPMaDD",
+      "distance": 2.7893928415656375,
+      "name": "Torstraße",
       "location": [
-        23.39764,
-        62.530872
+        13.397631,
+        52.529432
       ]
     },
     {
-      "hint": "IDFog7H_WYAAAAAAFwAAAAAAAAAkBQAAAAAAAAMZCEEAAAAAZBHuQwAAAAAXAAAAAAAAACQFAABXpgAA7xi-AZUhOQRLFP4B051SBAAAvw6PMaDD",
-      "distance": 237497.5919207393,
-      "name": "",
+      "hint": "HT0ggP___38dAAAAyAAAACQAAABKAAAAsowKQkpQX0Lx6yZCvsQGQh0AAABkAAAAJAAAACUAAABXpgAASufMAOdwIQNL58wA03AhAwMAvxCPMaDD",
+      "distance": 2.2265954222656257,
+      "name": "Platz der Vereinten Nationen",
       "location": [
-        29.235439,
-        70.853013
+        13.428554,
+        52.523239
       ]
     }
   ],
