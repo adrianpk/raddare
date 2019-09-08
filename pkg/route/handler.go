@@ -4,10 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/raddare/internal/osrm"
 )
 
+// TODO: Move busines logic to a service.
+// Only for a matter of time all logic
+// is code directly in this handler.
 func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -19,20 +23,47 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get OSRM handler.
-	osrm, err := m.osrmHandler()
+	oh, err := m.osrmHandler()
 	if err != nil {
 		m.errorResponse(w, r, err)
 	}
 
 	// Call API
-	routes, err := osrm.Routes(wps.All())
-	if err != nil {
-		m.errorResponse(w, r, err)
+	// One reques for each origin-destination
+	// waypoint tuple.
+	resp := []*osrm.Response{}
+	respCh := make(chan channeledResponse)
+	combs := wps.Combinations()
+	qty := len(combs)
+
+	// Make concurrent API calls.
+	for _, points := range combs {
+		go m.osrmRequest(oh, points, respCh)
+	}
+
+	// Collect responses.
+	for i := 0; i < qty; i++ {
+		ch := <-respCh
+		if ch.err != nil {
+			m.Log().Error(err)
+			continue
+		}
+		resp = append(resp, ch.res)
 	}
 
 	// Output result.
-	out := fmt.Sprintf("getRoutesHandler:\n\n%+v", routes)
+	out := fmt.Sprintf("getRoutesHandler:\n\n%s", m.respDump(resp))
 	w.Write([]byte(out))
+}
+
+func (m *Manager) osrmRequest(oh *osrm.Handler, points [][2]float64, ch chan<- channeledResponse) {
+	chRes := channeledResponse{}
+	res, err := oh.Routes(points)
+	if err != nil {
+		chRes.err = err
+	}
+	chRes.res = res
+	ch <- chRes
 }
 
 func (m *Manager) errorResponse(w http.ResponseWriter, r *http.Request, err error) {
@@ -55,4 +86,13 @@ func (m *Manager) osrmHandler() (*osrm.Handler, error) {
 	}
 
 	return osrm, nil
+}
+
+func (m *Manager) respDump(resps []*osrm.Response) string {
+	var sb strings.Builder
+	for _, r := range resps {
+		sb.WriteString(r.Code)
+		sb.WriteString(" ")
+	}
+	return sb.String()
 }

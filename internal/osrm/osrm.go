@@ -20,7 +20,6 @@ type (
 
 // NewHandler creates and returns a new repo handler.
 func NewHandler(ctx context.Context, cfg *config.Config, log *log.Logger, name string) (*Handler, error) {
-	// name := fmt.Sprintf("osrm-handler")
 	log.Info("New handler", "name", name)
 
 	host := cfg.ValOrDef("osrm.host", "localhost")
@@ -65,6 +64,7 @@ func (h *Handler) Routes(points [][2]float64) (*Response, error) {
 	return &res, nil
 }
 
+// query is a generic OSRM query request maker.
 func (h *Handler) query(ctx context.Context, req *Request, res *Response) error {
 	err := h.Client.MakeRequest(ctx, req, res)
 	if err != nil {
