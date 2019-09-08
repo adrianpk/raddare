@@ -24,10 +24,11 @@ func NewHandler(ctx context.Context, cfg *config.Config, log *log.Logger, name s
 	log.Info("New handler", "name", name)
 
 	host := cfg.ValOrDef("osrm.host", "localhost")
+	url := fmt.Sprintf("https://%s", host)
 
 	h := &Handler{
 		BaseHandler: svc.NewBaseHandler(ctx, cfg, log, name),
-		Client:      newClient(host),
+		Client:      newClient(url),
 	}
 
 	return h, nil
@@ -65,12 +66,11 @@ func (h *Handler) Routes(points [][2]float64) (*Response, error) {
 }
 
 func (h *Handler) query(ctx context.Context, req *Request, res *Response) error {
-	fmt.Printf("%+v", h)
 	err := h.Client.MakeRequest(ctx, req, res)
 	if err != nil {
 		return err
 	}
-	return res.Error()
+	return nil
 }
 
 func (h *Handler) reqTimeout() time.Duration {
