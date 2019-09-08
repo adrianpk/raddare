@@ -1,7 +1,5 @@
 package route
 
-import "fmt"
-
 // RoutingReq  maps service request.
 type (
 	RoutingReq struct {
@@ -33,12 +31,11 @@ type (
 	}
 )
 
+// All consolidate origin and destination
+// coordinates in a single slice.
 func (w *Waypoints) All() [][2]float64 {
 	res := make([][2]float64, 0)
 	res = append(res, w.Src)
 	res = append(res, w.Dst...)
-
-	fmt.Printf("\n--%+v--\n", res)
-
 	return res
 }
