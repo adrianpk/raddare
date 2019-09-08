@@ -13,7 +13,7 @@ type (
 		Lng float64 `json:"lng"`
 	}
 
-	ReqParams struct {
+	Waypoints struct {
 		Src [2]float64
 		Dst [][2]float64
 	}
