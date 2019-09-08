@@ -32,3 +32,11 @@ type (
 		Distance    float64 `json:"distance"`
 	}
 )
+
+func (w *Waypoints) All() [][2]float64 {
+	size := len(w.Src) + len(w.Dst)
+	res := make([][2]float64, size)
+	res = append(res, w.Src)
+	res = append(res, w.Dst...)
+	return res
+}
