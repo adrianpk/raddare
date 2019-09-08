@@ -1,6 +1,7 @@
 #!/bin/sh
-# Build
-# ./scripts/build.sh
+
+# Local run script
+# It first sets envvars.
 
 # Free ports
 killall -9 raddare
