@@ -11,7 +11,7 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 
 	wps, ok := ctx.Value(waypointsCtxKey).(*Waypoints)
 	if !ok {
-		err := errors.New("incomplete coords data")
+		err := errors.New("incomplete coordinates data")
 		m.errorResponse(w, r, err)
 	}
 
