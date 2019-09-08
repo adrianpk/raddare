@@ -2,6 +2,7 @@ package osrm
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"gitlab.com/mikrowezel/config"
@@ -22,8 +23,11 @@ func NewHandler(ctx context.Context, cfg *config.Config, log *log.Logger, name s
 	// name := fmt.Sprintf("osrm-handler")
 	log.Info("New handler", "name", name)
 
+	host := cfg.ValOrDef("osrm.host", "localhost")
+
 	h := &Handler{
 		BaseHandler: svc.NewBaseHandler(ctx, cfg, log, name),
+		Client:      newClient(host),
 	}
 
 	return h, nil
@@ -48,6 +52,7 @@ func (h *Handler) Init(s svc.Service) chan bool {
 // Sample URL: 'http://router.project-osrm.org/route/v1/driving/13.388860,52.517037;13.397634,52.529407?overview=false'
 func (h *Handler) Routes(points [][2]float64) (*Response, error) {
 	var res Response
+
 	ctx, _ := context.WithTimeout(context.Background(), h.reqTimeout())
 	req := h.newRoutesRequest(toPointSet(points))
 
@@ -60,6 +65,7 @@ func (h *Handler) Routes(points [][2]float64) (*Response, error) {
 }
 
 func (h *Handler) query(ctx context.Context, req *Request, res *Response) error {
+	fmt.Printf("%+v", h)
 	err := h.Client.MakeRequest(ctx, req, res)
 	if err != nil {
 		return err
