@@ -51,11 +51,11 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 		responses = append(responses, ch.res)
 	}
 
-	// Choose best detination
-	best := m.bestRoute(responses)
+	// Sort results
+	m.sortRoutes(responses)
 
 	// Output result.
-	out := fmt.Sprintf("getRoutesHandler:\n\nBest route:\n\n%+v", best)
+	out := fmt.Sprintf("getRoutesHandler:\n\nSorted:\n\n%s", m.responsesDump(responses))
 	w.Write([]byte(out))
 }
 
@@ -98,11 +98,10 @@ func (m *Manager) osrmHandler() (*osrm.Handler, error) {
 	return osrm, nil
 }
 
-func (m *Manager) respDump(resps []*osrm.Response) string {
+func (m *Manager) responsesDump(resps []*osrm.Response) string {
 	var sb strings.Builder
 	for _, r := range resps {
-		sb.WriteString(r.Code)
-		sb.WriteString(" ")
+		sb.WriteString(fmt.Sprintf("%+v\n", r.Routes))
 	}
 	return sb.String()
 }
