@@ -9,11 +9,11 @@ PATH="routes"
 SRC_LAT="13.388860"
 SRC_LNG="52.517037"
 # DST 1
-DST_LAT_1="23.397634"
-DST_LNG_1="62.529407"
+DST_LAT_1="13.397634"
+DST_LNG_1="52.529407"
 # DST 2
-DST_LAT_2="33.428555"
-DST_LNG_2="72.523219"
+DST_LAT_2="13.428555"
+DST_LNG_2="52.523219"
 
 # Pre
 # Curl and jq installed using nix not found if path not appropriately set
