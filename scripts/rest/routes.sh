@@ -23,7 +23,7 @@ DST_LNG_2="72.523219"
 # alias curl=$curlcmd
 
 post () {
-  echo "PUT $1"
+  echo "GET $1"
   /usr/bin/curl -X GET $1
 }
 
