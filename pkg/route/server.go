@@ -41,7 +41,7 @@ func (m *Manager) initServer() error {
 
 func (m *Manager) routesCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		rp := &ReqParams{}
+		wps := &Waypoints{}
 
 		// Process query string parameters
 		keys := r.URL.Query()
@@ -66,7 +66,7 @@ func (m *Manager) routesCtx(next http.Handler) http.Handler {
 
 				// Update source if tuple is complete
 				if okLat && okLng {
-					rp.Src = [2]float64{lat, lng}
+					wps.Src = [2]float64{lat, lng}
 				}
 			}
 
@@ -99,12 +99,12 @@ func (m *Manager) routesCtx(next http.Handler) http.Handler {
 					if okLat && okLng {
 						dsts = append(dsts, [2]float64{lat, lng})
 					}
-					rp.Dst = dsts
+					wps.Dst = dsts
 				}
 			}
 		}
 
-		ctx := context.WithValue(r.Context(), routesCtxKey, rp)
+		ctx := context.WithValue(r.Context(), waypointsCtxKey, wps)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
