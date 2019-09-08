@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/raddare/internal/osrm"
 )
 
 func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
@@ -15,8 +17,17 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 		m.errorResponse(w, r, err)
 	}
 
-	out := fmt.Sprintf("getRoutesHandler:\n\n%+v", wps)
+	osrm, err := m.osrmHandler()
+	if err != nil {
+		m.errorResponse(w, r, err)
+	}
 
+	routes, err := osrm.Routes(wps.All())
+	if err != nil {
+		m.errorResponse(w, r, err)
+	}
+
+	out := fmt.Sprintf("getRoutesHandler:\n\n%+v", routes)
 	w.Write([]byte(out))
 }
 
@@ -26,4 +37,18 @@ func (m *Manager) errorResponse(w http.ResponseWriter, r *http.Request, err erro
 	str := fmt.Sprintf(`{"data":"","error":"%s"}`, err.Error())
 	fmt.Fprint(w, str)
 	m.Log().Error(err, err.Error())
+}
+
+func (m *Manager) osrmHandler() (*osrm.Handler, error) {
+	h, ok := m.Handler("osrm-handler")
+	if !ok {
+		return nil, errors.New("OSRM handler not available")
+	}
+
+	osrm, ok := h.(*osrm.Handler)
+	if !ok {
+		return nil, errors.New("invalidad OSRM handler")
+	}
+
+	return osrm, nil
 }

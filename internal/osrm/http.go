@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"sort"
 	"strings"
+	"time"
 )
 
 type (
@@ -43,13 +44,13 @@ type (
 	// used to store options for OSRM requests.
 	Options map[string]string
 
-	// PointSet is an alias for a slice of Point.
-	// used to store geo location geometries..
-	PointSet []Point
-
 	// Point is an alias for a two float64 elements array.
 	// used to store geo location coordinates.
 	Point [2]float64
+
+	// PointSet is an alias for a slice of Point.
+	// used to store geo location geometries..
+	PointSet []Point
 
 	// Response struct is used to unmarshall an OSRM response.
 	Response struct {
@@ -82,12 +83,16 @@ type (
 )
 
 // newClient creates a custom HTTP client.
-func newClient(c httpClient, url string) client {
+func newClient(url string) client {
+	var c = &http.Client{
+		Timeout: time.Second * 10,
+	}
 	return client{c, url}
 }
 
 // newRoutesRequest creates a request.
 func (h Handler) newRoutesRequest(points PointSet) *Request {
+	fmt.Printf("\n%+v\n", points)
 	return &Request{
 		Service: "route",
 		Version: h.Cfg().ValOrDef("osrm.api.ver", "v1"),
@@ -98,13 +103,26 @@ func (h Handler) newRoutesRequest(points PointSet) *Request {
 }
 
 // Lat returns point latitude value.
-func (p *Point) Lat() float64 {
+func (p Point) Lat() float64 {
 	return p[0]
 }
 
 // Lng returns point longitude value.
-func (p *Point) Lng() float64 {
+func (p Point) Lng() float64 {
 	return p[1]
+}
+
+// ToQueryParams returns a string representation of
+// the pointset formated as query string value
+// used in OSRM queries.
+func (ps *PointSet) ToQueryParams() string {
+	var qs strings.Builder
+
+	for _, p := range *ps {
+		qs.WriteString(fmt.Sprintf("%f,%f;", p.Lat(), p.Lng()))
+	}
+
+	return qs.String()
 }
 
 // URL generates a url for OSRM request
@@ -127,12 +145,13 @@ func (r *Request) URL(hostURL string) (reqURL string, err error) {
 
 	// http://{host}/{service}/{version}/{profile}/{coords}[.{format}]?option=value&option2=value2
 	// i.e.: 'http://router.project-osrm.org/route/v1/driving/13.388860,52.517037;13.397634,52.529407?overview=false'
+
 	reqURL = strings.Join([]string{
-		hostURL,   // host
-		r.Service, // service
-		r.Version, // version
-		r.Profile, // profile
-		"polyline(" + url.PathEscape(r.EncodePoints()) + ")", // coords
+		hostURL,                  // host
+		r.Service,                // service
+		r.Version,                // version
+		r.Profile,                // profile
+		r.Points.ToQueryParams(), // coords
 	}, "/")
 
 	if r.CountOptions() > 0 {
