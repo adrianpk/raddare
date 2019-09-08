@@ -1,0 +1,56 @@
+{
+  "routes": [
+    {
+      "legs": [
+        {
+          "summary": "",
+          "weight": 91093.4,
+          "duration": 88712.4,
+          "steps": [],
+          "distance": 1997127.7
+        },
+        {
+          "summary": "",
+          "weight": 64801.5,
+          "duration": 64083.6,
+          "steps": [],
+          "distance": 1249777.5
+        }
+      ],
+      "weight_name": "routability",
+      "weight": 155894.9,
+      "duration": 152796,
+      "distance": 3246905.2
+    }
+  ],
+  "waypoints": [
+    {
+      "hint": "8jF-iXcyfokkAAAAdQEAAAgAAAAAAAAAr6k0QU1xpUHXHxZAAAAAACQAAAB1AQAACAAAAAAAAABXpgAA_kvMAKlYIQM8TMwArVghAwEA7wqPMaDD",
+      "distance": 4.231665624816857,
+      "name": "Friedrichstraße",
+      "location": [
+        13.388798,
+        52.517033
+      ]
+    },
+    {
+      "hint": "eVZBgn1WQYJeAAAAAAAAAGEPAAAAAAAAAGhbQgAAAAA25g9FAAAAAF4AAAAAAAAAYQ8AAAAAAABXpgAACAVlATglugMCBWUBfx-6Az8A3wqPMaDD",
+      "distance": 163.28444427272424,
+      "name": "Kieriahontie",
+      "location": [
+        23.39764,
+        62.530872
+      ]
+    },
+    {
+      "hint": "IDFog7H_WYAAAAAAFwAAAAAAAAAkBQAAAAAAAAMZCEEAAAAAZBHuQwAAAAAXAAAAAAAAACQFAABXpgAA7xi-AZUhOQRLFP4B051SBAAAvw6PMaDD",
+      "distance": 237497.5919207393,
+      "name": "",
+      "location": [
+        29.235439,
+        70.853013
+      ]
+    }
+  ],
+  "code": "Ok"
+}
