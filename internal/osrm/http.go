@@ -43,34 +43,40 @@ type (
 	// Point is an alias for a two float64 elements array.
 	// used to store geo location coordinates.
 	Point [2]float64
+)
 
-	// Response struct is used to unmarshall an OSRM response.
+type (
+	// Response for OSRM request.
 	Response struct {
-		Routes    []Route    `json:"routes"`
-		Waypoints []Waypoint `json:"waypoints"`
-		Code      string     `json:"code"`
+		Routes    []Routes    `json:"routes"`
+		Waypoints []Waypoints `json:"waypoints"`
+		Code      string      `json:"code"`
 	}
 
+	// Legs values.
 	Legs struct {
 		Summary  string        `json:"summary"`
-		Weight   int           `json:"weight"`
+		Weight   float64       `json:"weight"`
 		Duration float64       `json:"duration"`
 		Steps    []interface{} `json:"steps"`
 		Distance float64       `json:"distance"`
 	}
 
-	Route struct {
+	// Routes values
+	Routes struct {
 		Legs       []Legs  `json:"legs"`
 		WeightName string  `json:"weight_name"`
-		Weight     int     `json:"weight"`
-		Duration   float64 `json:"duration"`
+		Weight     float64 `json:"weight"`
+		Duration   int     `json:"duration"`
 		Distance   float64 `json:"distance"`
 	}
 
-	Waypoint struct {
-		Hint  string  `json:"hint"`
-		Name  string  `json:"name"`
-		Point []Point `json:"location"`
+	// Waypoints values
+	Waypoints struct {
+		Hint     string    `json:"hint"`
+		Distance float64   `json:"distance"`
+		Name     string    `json:"name"`
+		Location []float64 `json:"location"`
 	}
 )
 
@@ -190,6 +196,7 @@ func (c client) MakeRequest(ctx context.Context, req *Request, res interface{}) 
 	}
 
 	// Unmarshall response.
+	fmt.Printf("\n%s\n", string(bytes))
 	err = json.Unmarshal(bytes, res)
 	if err != nil {
 		return fmt.Errorf("response body cannot be unmarshalled")
@@ -205,11 +212,6 @@ func (c client) get(ctx context.Context, url string) (*http.Response, error) {
 	}
 
 	return c.httpClient.Do(req.WithContext(ctx))
-}
-
-// PolylineFactor value used for encoding.
-func (r *Request) PolylineFactor() float64 {
-	return 1.0e6
 }
 
 // EncodeOptions into a string.
@@ -245,21 +247,6 @@ func (r Response) Error() error {
 		return fmt.Errorf("OSRM API error code: %s", r.Code)
 	}
 	return nil
-}
-
-func encodeSignedNumber(num int, result []byte) []byte {
-	shifted := num << 1
-
-	if num < 0 {
-		shifted = ^shifted
-	}
-
-	for shifted >= 0x20 {
-		result = append(result, byte(0x20|(shifted&0x1f)+63))
-		shifted >>= 5
-	}
-
-	return append(result, byte(shifted+63))
 }
 
 func closeBody(c io.Closer) {
