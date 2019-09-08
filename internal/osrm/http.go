@@ -123,8 +123,12 @@ func toPoints(points [][2]float64) []Point {
 func toQueryParams(ps []Point) string {
 	var qs strings.Builder
 
-	for _, p := range ps {
-		qs.WriteString(fmt.Sprintf("%f,%f;", p.Lat(), p.Lng()))
+	last := len(ps) - 1
+	for i, p := range ps {
+		qs.WriteString(fmt.Sprintf("%f,%f", p.Lat(), p.Lng()))
+		if i < last {
+			qs.WriteString(";")
+		}
 	}
 
 	return qs.String()
