@@ -1,17 +1,13 @@
 package osrm
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"math"
 	"net/http"
-	"net/url"
-	"sort"
 	"strings"
 	"time"
 )
@@ -216,69 +212,22 @@ func (r *Request) PolylineFactor() float64 {
 	return 1.0e6
 }
 
-// EncodePoints values into a string.
-func (r *Request) EncodePoints() string {
-	f := r.PolylineFactor()
-
-	var pLat int
-	var pLng int
-
-	var result bytes.Buffer
-	mark1 := make([]byte, 0, 50)
-	mark2 := make([]byte, 0, 50)
-
-	for _, p := range r.Points {
-		latCorr := int(math.Floor(p.Lat()*f + 0.5))
-		lngCorr := int(math.Floor(p.Lng()*f + 0.5))
-
-		deltaLat := latCorr - pLat
-		deltaLng := lngCorr - pLng
-
-		pLat = latCorr
-		pLng = lngCorr
-
-		result.Write(append(encodeSignedNumber(deltaLat, mark1), encodeSignedNumber(deltaLng, mark2)...))
-
-		mark1 = mark1[:0]
-		mark2 = mark2[:0]
-	}
-
-	return result.String()
-}
-
 // EncodeOptions into a string.
 func (r *Request) EncodeOptions() string {
 	opts := r.Options
+	var qs strings.Builder
 
-	if opts == nil {
-		return ""
-	}
-
-	keys := make([]string, 0, len(opts))
-	for k := range opts {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	var buf []byte
-	for _, k := range keys {
-		if len(buf) > 0 {
-			buf = append(buf, '&')
+	i := 0
+	last := len(opts) - 1
+	for k, v := range opts {
+		qs.WriteString(fmt.Sprintf("%s=%s", k, v))
+		if i < last {
+			qs.WriteString(";")
 		}
-
-		buf = append(buf, url.QueryEscape(k)...)
-		buf = append(buf, '=')
-
-		for n, val := range opts[k] {
-			if n > 0 {
-				buf = append(buf, ';')
-			}
-
-			buf = append(buf, url.QueryEscape(string(val))...)
-		}
+		i++
 	}
-	return string(buf)
-	return ""
+
+	return qs.String()
 }
 
 // CountPoints in request.
