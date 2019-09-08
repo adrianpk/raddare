@@ -11,22 +11,26 @@ import (
 func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	// Get points from context.
 	wps, ok := ctx.Value(waypointsCtxKey).(*Waypoints)
 	if !ok {
 		err := errors.New("incomplete coordinates data")
 		m.errorResponse(w, r, err)
 	}
 
+	// Get OSRM handler.
 	osrm, err := m.osrmHandler()
 	if err != nil {
 		m.errorResponse(w, r, err)
 	}
 
+	// Call API
 	routes, err := osrm.Routes(wps.All())
 	if err != nil {
 		m.errorResponse(w, r, err)
 	}
 
+	// Output result.
 	out := fmt.Sprintf("getRoutesHandler:\n\n%+v", routes)
 	w.Write([]byte(out))
 }
