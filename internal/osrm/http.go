@@ -36,7 +36,7 @@ type (
 		Service string
 		Version string
 		Profile string
-		Points  PointSet
+		Points  []Point
 		Options Options
 	}
 
@@ -47,10 +47,6 @@ type (
 	// Point is an alias for a two float64 elements array.
 	// used to store geo location coordinates.
 	Point [2]float64
-
-	// PointSet is an alias for a slice of Point.
-	// used to store geo location geometries..
-	PointSet []Point
 
 	// Response struct is used to unmarshall an OSRM response.
 	Response struct {
@@ -91,8 +87,7 @@ func newClient(url string) client {
 }
 
 // newRoutesRequest creates a request.
-func (h Handler) newRoutesRequest(points PointSet) *Request {
-	fmt.Printf("\n%+v\n", points)
+func (h Handler) newRoutesRequest(points []Point) *Request {
 	return &Request{
 		Service: "route",
 		Version: h.Cfg().ValOrDef("osrm.api.ver", "v1"),
@@ -112,13 +107,23 @@ func (p Point) Lng() float64 {
 	return p[1]
 }
 
+// toPoints convert an slice of float64 two elements arrays
+// into a slice of Point
+func toPoints(points [][2]float64) []Point {
+	ps := make([]Point, 0)
+	for _, p := range points {
+		ps = append(ps, Point{p[0], p[1]})
+	}
+	return ps
+}
+
 // ToQueryParams returns a string representation of
-// the pointset formated as query string value
-// used in OSRM queries.
-func (ps *PointSet) ToQueryParams() string {
+// a slice of points formated as a query string
+// to be use in OSRM queries.
+func toQueryParams(ps []Point) string {
 	var qs strings.Builder
 
-	for _, p := range *ps {
+	for _, p := range ps {
 		qs.WriteString(fmt.Sprintf("%f,%f;", p.Lat(), p.Lng()))
 	}
 
@@ -147,11 +152,11 @@ func (r *Request) URL(hostURL string) (reqURL string, err error) {
 	// i.e.: 'http://router.project-osrm.org/route/v1/driving/13.388860,52.517037;13.397634,52.529407?overview=false'
 
 	reqURL = strings.Join([]string{
-		hostURL,                  // host
-		r.Service,                // service
-		r.Version,                // version
-		r.Profile,                // profile
-		r.Points.ToQueryParams(), // coords
+		hostURL,                 // host
+		r.Service,               // service
+		r.Version,               // version
+		r.Profile,               // profile
+		toQueryParams(r.Points), // coords
 	}, "/")
 
 	if r.CountOptions() > 0 {
@@ -287,17 +292,6 @@ func (r Response) Error() error {
 		return fmt.Errorf("OSRM API error code: %s", r.Code)
 	}
 	return nil
-}
-
-// toPointSet converts a slice of float64 two elements array
-// into a PointSet struct.
-func toPointSet(points [][2]float64) PointSet {
-	var pset PointSet
-	for _, point := range points {
-		p := [2]float64{point[0], point[1]}
-		pset = append(pset, p)
-	}
-	return pset
 }
 
 func encodeSignedNumber(num int, result []byte) []byte {
