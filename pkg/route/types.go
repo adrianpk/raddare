@@ -1,6 +1,6 @@
 package route
 
-import ()
+import "fmt"
 
 // RoutingReq  maps service request.
 type (
@@ -34,9 +34,11 @@ type (
 )
 
 func (w *Waypoints) All() [][2]float64 {
-	size := len(w.Src) + len(w.Dst)
-	res := make([][2]float64, size)
+	res := make([][2]float64, 0)
 	res = append(res, w.Src)
 	res = append(res, w.Dst...)
+
+	fmt.Printf("\n--%+v--\n", res)
+
 	return res
 }

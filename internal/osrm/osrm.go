@@ -54,7 +54,7 @@ func (h *Handler) Routes(points [][2]float64) (*Response, error) {
 	var res Response
 
 	ctx, _ := context.WithTimeout(context.Background(), h.reqTimeout())
-	req := h.newRoutesRequest(toPointSet(points))
+	req := h.newRoutesRequest(toPoints(points))
 
 	err := h.query(ctx, req, &res)
 	if err != nil {
