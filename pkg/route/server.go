@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi"
@@ -25,18 +27,91 @@ func (m *Manager) initServer() error {
 	})
 
 	r.Route("/routes", func(r chi.Router) {
+		r.Use(m.routesCtx)
 		r.Get("/", m.getRoutesHandler) // POST /routes
 	})
 
-	err := http.ListenAndServe(":8080", r)
+	p := m.Cfg().ValOrDef("server.port", ":8080")
+
+	err := http.ListenAndServe(p, r)
 	fmt.Println(err)
+
 	return err
 }
 
 func (m *Manager) routesCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		someParameter := chi.URLParam(r, "someParameter")
-		ctx := context.WithValue(r.Context(), routesCtxKey, someParameter)
+		rp := &ReqParams{}
+
+		// Process query string parameters
+		keys := r.URL.Query()
+
+		for k, v := range keys {
+
+			// Process source (from)
+			if k == "src" {
+
+				latlng := strings.Split(v[0], ",")
+
+				// Ensure source.
+				if len(latlng) < 2 {
+					continue
+				}
+
+				// Get source latitude.
+				lat, okLat := toFloat(latlng[0])
+
+				// Get source longitude.
+				lng, okLng := toFloat(latlng[1])
+
+				// Update source if tuple is complete
+				if okLat && okLng {
+					rp.Src = [2]float64{lat, lng}
+				}
+			}
+
+			// Process destinations (to)
+			if k == "dst" {
+				// Ensure even number of values (lat & lng tuples)
+				if len(v)%2 != 0 {
+					v = v[:len(v)-1]
+				}
+
+				// Ensure at least one destination
+				if len(v) < 2 {
+					continue
+				}
+
+				dsts := make([][2]float64, 0)
+
+				for i, _ := range v {
+					//latlng := strings.FieldsFunc(v[i], split)
+
+					latlng := strings.Split(v[i], ",")
+
+					// Get source latitude.
+					lat, okLat := toFloat(latlng[0])
+
+					// Get source longitude.
+					lng, okLng := toFloat(latlng[1])
+
+					// Update destinations if tuple is complete
+					if okLat && okLng {
+						dsts = append(dsts, [2]float64{lat, lng})
+					}
+					rp.Dst = dsts
+				}
+			}
+		}
+
+		ctx := context.WithValue(r.Context(), routesCtxKey, rp)
+
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func toFloat(floatVal string) (res float64, ok bool) {
+	res, err := strconv.ParseFloat(floatVal, 64)
+	ok = err == nil
+	return res, ok
 }
