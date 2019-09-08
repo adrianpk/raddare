@@ -61,10 +61,17 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 
 func (m *Manager) osrmRequest(oh *osrm.Handler, points [][2]float64, ch chan<- channeledResponse) {
 	chRes := channeledResponse{}
+
 	res, err := oh.Routes(points)
 	if err != nil {
 		chRes.err = err
 	}
+
+	// Discard non "Ok" responses
+	if res.Code != "Ok" {
+		chRes.err = errors.New("on Ok response")
+	}
+
 	chRes.res = res
 	ch <- chRes
 }
