@@ -31,12 +31,12 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Call API
 	// One reques for each origin-destination
 	// waypoint tuple.
-	resp := []*osrm.Response{}
+	responses := []*osrm.Response{}
 	respCh := make(chan channeledResponse)
 	combs := wps.Combinations()
 	qty := len(combs)
 
-	// Make concurrent API calls.
+	// OSRM concurrent API calls.
 	for _, points := range combs {
 		go m.osrmRequest(oh, points, respCh)
 	}
@@ -48,11 +48,14 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 			m.Log().Error(err)
 			continue
 		}
-		resp = append(resp, ch.res)
+		responses = append(responses, ch.res)
 	}
 
+	// Choose best detination
+	best := m.bestRoute(responses)
+
 	// Output result.
-	out := fmt.Sprintf("getRoutesHandler:\n\n%s", m.respDump(resp))
+	out := fmt.Sprintf("getRoutesHandler:\n\nBest route:\n\n%+v", best)
 	w.Write([]byte(out))
 }
 
