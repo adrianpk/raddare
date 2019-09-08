@@ -26,6 +26,9 @@ clean:
 run:
 	./scripts/run.sh
 
+curl-routes:
+	./scripts/rest/routes.sh
+
 connect-stg:
 	gcloud beta container clusters get-credentials ${GC_STG_CLUSTER} --region ${GC_REGION} --project ${GC_STG_PROJECT}
 
