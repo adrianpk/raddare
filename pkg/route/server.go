@@ -25,7 +25,7 @@ func (m *Manager) initServer() error {
 	})
 
 	r.Route("/routes", func(r chi.Router) {
-		r.Post("/", m.getRoutesHandler) // POST /routes
+		r.Get("/", m.getRoutesHandler) // POST /routes
 	})
 
 	err := http.ListenAndServe(":8080", r)
