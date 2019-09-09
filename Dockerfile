@@ -5,7 +5,7 @@ FROM golang:1.11-alpine AS build
 RUN apk update && apk add git
 
 # Set workdir
-WORKDIR /go/src/gitlab.com/mikrowezel/raddare
+WORKDIR /go/src/github.com/adrianpk/raddare
 
 # Force the go compiler to use modules
 ENV GO111MODULE=on
