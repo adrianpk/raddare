@@ -1,11 +1,29 @@
 # Raddare
 
-A simple route planner.
+A simple route planner service.
 
 ## Docker
-**Run**
 ```shell
 $ docker run --rm adrianpksw/raddare:stage
 ```
 
-More information coming soon...
+## Clone
+```shell
+$ git clone https://github.com/adrianpk/raddare.git
+```
+
+## Run
+```shell
+$ make run
+```
+
+## API Call
+```shell
+$ make curl-routes
+```
+
+## Status
+**This is a draft document**
+App and docs are under development.
+
+More info to come...
