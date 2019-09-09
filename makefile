@@ -91,6 +91,7 @@ current-conn:
 	kubectl config current-context
 
 get-deps:
+	go get "github.com/go-chi/chi"
 	go get "gitlab.com/mikrowezel/config"
 	go get "gitlab.com/mikrowezel/log"
 	go get "gitlab.com/mikrowezel/service"
