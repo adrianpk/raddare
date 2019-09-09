@@ -51,7 +51,7 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 		responses = append(responses, ch.res)
 	}
 
-	// Sort results
+	// Sort results.
 	m.sortRoutes(responses)
 
 	// Output result.
@@ -69,7 +69,7 @@ func (m *Manager) osrmRequest(oh *osrm.Handler, points [][2]float64, ch chan<- c
 
 	// Discard non "Ok" responses
 	if res.Code != "Ok" {
-		chRes.err = errors.New("on Ok response")
+		chRes.err = errors.New("non 'Ok' code response")
 	}
 
 	chRes.res = res
