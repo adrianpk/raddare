@@ -7,6 +7,9 @@ IMAGE_NAME=raddare
 BINARY_NAME=raddare
 BINARY_UNIX=$(BINARY_NAME)_unix
 
+# Docker
+DOCKER_ACCOUNT=adrianpksw
+
 all: test build
 
 build:
