@@ -1,5 +1,7 @@
 package osrm
 
+import "fmt"
+
 // OSRMRequest maps request data sent OSRM.
 // Ref.: http://project-osrm.org/docs/v5.5.1/api/#nearest-service
 type (
@@ -25,13 +27,13 @@ type (
 type (
 	// Response for OSRM request.
 	Response struct {
-		Routes    []Routes    `json:"routes"`
-		Waypoints []Waypoints `json:"waypoints"`
-		Code      string      `json:"code"`
+		Routes    []Route    `json:"routes"`
+		Waypoints []Waypoint `json:"waypoints"`
+		Code      string     `json:"code"`
 	}
 
 	// Legs values.
-	Legs struct {
+	Leg struct {
 		Summary  string        `json:"summary"`
 		Weight   float64       `json:"weight"`
 		Duration float64       `json:"duration"`
@@ -40,8 +42,8 @@ type (
 	}
 
 	// Routes values
-	Routes struct {
-		Legs       []Legs  `json:"legs"`
+	Route struct {
+		Legs       []Leg   `json:"legs"`
 		WeightName string  `json:"weight_name"`
 		Weight     float64 `json:"weight"`
 		Duration   float64 `json:"duration"`
@@ -49,10 +51,19 @@ type (
 	}
 
 	// Waypoints values
-	Waypoints struct {
+	Waypoint struct {
 		Hint     string    `json:"hint"`
 		Distance float64   `json:"distance"`
 		Name     string    `json:"name"`
 		Location []float64 `json:"location"`
 	}
 )
+
+// Return source coordinates as a string.
+func (w *Waypoint) AsString() (coords string, ok bool) {
+	if len(w.Location) != 2 {
+		return "0.0,0.0", false
+	}
+
+	return fmt.Sprintf("%f,%f", w.Location[0], w.Location[1]), true
+}

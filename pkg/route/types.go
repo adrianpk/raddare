@@ -1,6 +1,13 @@
 package route
 
-import "github.com/raddare/internal/osrm"
+import (
+	"fmt"
+
+	"github.com/raddare/internal/osrm"
+)
+
+// FIX: Improve naming consitency
+// i.e.: Src/Source, singular name for types, etc...
 
 // RoutingReq  maps service request.
 type (
@@ -22,11 +29,11 @@ type (
 // RoutingRes maps service response.
 type (
 	RoutingRes struct {
-		Source string   `json:"source"`
-		Routes []Routes `json:"routes"`
+		Source string  `json:"source"`
+		Routes []Route `json:"routes"`
 	}
 
-	Routes struct {
+	Route struct {
 		Destination string  `json:"destination"`
 		Duration    float64 `json:"duration"`
 		Distance    float64 `json:"distance"`
@@ -39,6 +46,15 @@ type (
 		err error
 	}
 )
+
+// Return source coordinates as a string.
+func (w *Waypoints) SrcAsString() (coords string, ok bool) {
+	if len(w.Src) != 2 {
+		return "0.0,0.0", false
+	}
+
+	return fmt.Sprintf("%f,%f", w.Src[0], w.Src[1]), true
+}
 
 // Combinations consolidate origin and destination
 // coordinates in a single slice.
