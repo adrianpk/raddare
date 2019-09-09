@@ -51,7 +51,7 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 		responses = append(responses, ch.res)
 	}
 
-	// Sort results
+	// Sort results.
 	m.sortRoutes(responses)
 
 	// Output result.
