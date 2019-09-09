@@ -150,6 +150,7 @@ func (c client) MakeRequest(ctx context.Context, req *Request, res interface{}) 
 }
 
 func (c client) get(ctx context.Context, url string) (*http.Response, error) {
+	//fmt.Println(url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err

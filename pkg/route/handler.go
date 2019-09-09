@@ -4,10 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/raddare/internal/osrm"
 )
 
+// TODO: Move busines logic to a service.
+// Only for a matter of time all logic
+// is code directly in this handler.
 func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -19,20 +23,57 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get OSRM handler.
-	osrm, err := m.osrmHandler()
+	oh, err := m.osrmHandler()
 	if err != nil {
 		m.errorResponse(w, r, err)
 	}
 
 	// Call API
-	routes, err := osrm.Routes(wps.All())
-	if err != nil {
-		m.errorResponse(w, r, err)
+	// One reques for each origin-destination
+	// waypoint tuple.
+	responses := []*osrm.Response{}
+	respCh := make(chan channeledResponse)
+	combs := wps.Combinations()
+	qty := len(combs)
+
+	// OSRM concurrent API calls.
+	for _, points := range combs {
+		go m.osrmRequest(oh, points, respCh)
 	}
 
+	// Collect responses.
+	for i := 0; i < qty; i++ {
+		ch := <-respCh
+		if ch.err != nil {
+			m.Log().Error(err)
+			continue
+		}
+		responses = append(responses, ch.res)
+	}
+
+	// Sort results
+	m.sortRoutes(responses)
+
 	// Output result.
-	out := fmt.Sprintf("getRoutesHandler:\n\n%+v", routes)
+	out := fmt.Sprintf("getRoutesHandler:\n\nSorted:\n\n%s", m.responsesDump(responses))
 	w.Write([]byte(out))
+}
+
+func (m *Manager) osrmRequest(oh *osrm.Handler, points [][2]float64, ch chan<- channeledResponse) {
+	chRes := channeledResponse{}
+
+	res, err := oh.Routes(points)
+	if err != nil {
+		chRes.err = err
+	}
+
+	// Discard non "Ok" responses
+	if res.Code != "Ok" {
+		chRes.err = errors.New("on Ok response")
+	}
+
+	chRes.res = res
+	ch <- chRes
 }
 
 func (m *Manager) errorResponse(w http.ResponseWriter, r *http.Request, err error) {
@@ -55,4 +96,12 @@ func (m *Manager) osrmHandler() (*osrm.Handler, error) {
 	}
 
 	return osrm, nil
+}
+
+func (m *Manager) responsesDump(resps []*osrm.Response) string {
+	var sb strings.Builder
+	for _, r := range resps {
+		sb.WriteString(fmt.Sprintf("%+v\n", r.Routes))
+	}
+	return sb.String()
 }
