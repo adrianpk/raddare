@@ -1,6 +1,7 @@
 package route
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -20,12 +21,14 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		err := errors.New("incomplete coordinates data")
 		m.errorResponse(w, r, err)
+		return
 	}
 
 	// Get OSRM handler.
 	oh, err := m.osrmHandler()
 	if err != nil {
 		m.errorResponse(w, r, err)
+		return
 	}
 
 	// Call API
@@ -54,9 +57,45 @@ func (m *Manager) getRoutesHandler(w http.ResponseWriter, r *http.Request) {
 	// Sort results.
 	m.sortRoutes(responses)
 
+	// Transform output
+	json, err := m.genJSONResponse(wps, responses)
+	if err != nil {
+		m.errorResponse(w, r, err)
+		return
+	}
+
 	// Output result.
-	out := fmt.Sprintf("getRoutesHandler:\n\nSorted:\n\n%s", m.responsesDump(responses))
-	w.Write([]byte(out))
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(json)
+}
+
+func (m *Manager) genJSONResponse(wp *Waypoints, ors []*osrm.Response) ([]byte, error) {
+	rr := m.genRoutingRes(wp, ors)
+	return json.Marshal(rr)
+}
+
+func (m *Manager) genRoutingRes(wp *Waypoints, ors []*osrm.Response) RoutingRes {
+	routes := []Route{}
+
+	src, _ := wp.SrcAsString() // TODO: Check ok
+
+	for _, or := range ors {
+		orr := or.Routes[0]       // Routing data
+		orw := or.Waypoints[1]    // Destination
+		dest, _ := orw.AsString() // TODO: Check ok
+
+		r := Route{
+			Destination: dest,
+			Duration:    orr.Duration,
+			Distance:    orr.Distance,
+		}
+		routes = append(routes, r)
+	}
+
+	return RoutingRes{
+		Source: src,
+		Routes: routes,
+	}
 }
 
 func (m *Manager) osrmRequest(oh *osrm.Handler, points [][2]float64, ch chan<- channeledResponse) {
